@@ -71,3 +71,5 @@ C:\Users\Mardul\source\repos\Mardul.FitnessWebApi\Mardul.FitnessWebApi\bin\Debug
 C:\Users\Mardul\source\repos\Mardul.FitnessWebApi\Mardul.FitnessWebApi\bin\Debug\net5.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\Users\Mardul\source\repos\Mardul.FitnessWebApi\Mardul.FitnessWebApi\bin\Debug\net5.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\Mardul\source\repos\Mardul.FitnessWebApi\Mardul.FitnessWebApi\bin\Debug\net5.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\Mardul\source\repos\Mardul.FitnessWebApi\Mardul.FitnessWebApi\bin\Debug\net5.0\AutoMapper.dll
+C:\Users\Mardul\source\repos\Mardul.FitnessWebApi\Mardul.FitnessWebApi\bin\Debug\net5.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

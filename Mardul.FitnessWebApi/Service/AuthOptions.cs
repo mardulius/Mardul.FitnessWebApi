@@ -9,9 +9,9 @@ namespace Mardul.FitnessWebApi.Service
 {
     public class AuthOptions
     {
-        public const string ISSUER = "MyAuthServer"; // издатель токена
-        public const string AUDIENCE = "MyAuthClient"; // потребитель токена
-        const string KEY = "ThisMySecrtetKey!";   // ключ для шифрации
+        public const string ISSUER = "MardulWebApi"; // издатель токена
+        public const string AUDIENCE = "MardulMobile"; // потребитель токена
+        const string KEY = "Fgbt45Esq1!ppoyRTfgdf%ee";   // ключ для шифрации
         public const int LIFETIME = 15; // время жизни токена - 15 минут
         public static SymmetricSecurityKey GetSymmetricSecurityKey()
         {

@@ -58,19 +58,23 @@ namespace Mardul.FitnessWebApi.Controllers
         public async Task<ActionResult> Login(LoginBindingModel loginModel)
             
         {
-            
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
             var user = await _userManager.FindByNameAsync(loginModel.UserName);
             if (user != null && await _userManager.CheckPasswordAsync(user, loginModel.Password))
             {
 
 
 
-                var tokenString = GenerateJWT(loginModel);
+                var tokenString = GenerateJWT(user);
 
 
                 var response = new
                 {
-                    access_token = tokenString,
+                    accessToken = tokenString,
                     username = user.UserName
                 };
 
@@ -79,18 +83,24 @@ namespace Mardul.FitnessWebApi.Controllers
 
             else
             {
-                return BadRequest();
+                return Unauthorized();
             }
 
 
 
         }
 
-        private string GenerateJWT(LoginBindingModel userModel)
+        private string GenerateJWT(User user)
         {
+            var claims = new[]
+        {
+            new Claim(ClaimTypes.Name, user.Id),
+            
+        };
             var jwt = new JwtSecurityToken(
                         issuer: AuthOptions.ISSUER,
                         audience: AuthOptions.AUDIENCE,
+                        claims: claims,
                         expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
                         signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
           

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Mardul.FitnessWebApi.Service
 {
-    //public class FitnessContext : DbContext    
+   
     public class FitnessContext : IdentityDbContext
 
     {

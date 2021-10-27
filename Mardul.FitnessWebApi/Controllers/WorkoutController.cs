@@ -1,4 +1,5 @@
-﻿using Mardul.FitnessWebApi.Model;
+﻿using Mardul.FitnessWebApi.Dto;
+using Mardul.FitnessWebApi.Model;
 using Mardul.FitnessWebApi.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace Mardul.FitnessWebApi.Controllers
 {
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [Route("api/[controller]")]
     [ApiController]
     public class WorkoutController : ControllerBase
@@ -25,25 +27,62 @@ namespace Mardul.FitnessWebApi.Controllers
             _userManager = userManager;
 
         }
-        [Authorize]
+
         [HttpGet]
         public async Task<ActionResult> Get()
         {
-            var signUser = await _userManager.GetUserAsync(HttpContext.User);
 
-            var users = db.Users
-                .Include(x => x.Workouts)
-                .ThenInclude(x => x.Exercises)
-               .ToList();
+            var userId = User.Identity.Name;
 
-            var us = users.FirstOrDefault(a => a == signUser);
-            
+            var works = db.Users
+                 .Where(x => x.Id == userId)
+                  .Select(x => new UserDto()
+                  {
 
-            return Ok(us);
+                      Workouts = x.Workouts.Select(w => new WorkoutDto()
+                      {
+                          Id = w.Id,
+                          Name = w.Name,
+                          Exercises = w.Exercises.Select(e => new ExerciseDto
+                          {
+                              Id = e.Id,
+                              Name = e.Name,
+                              MuscleGroupName = e.MuscleGroup.Name
+                          }),
+                      })
+                  })
+               .FirstOrDefault();
+
+            //var works = db.Users
+            //     .Where(x => x.Id == userId)
+            //      .Select(x => new UserDto()
+            //      {
+
+            //          Workouts = x.Workouts.Select(w => new WorkoutDto()
+            //          {
+            //              Id = w.Id,
+            //              Name = w.Name,
+            //              Exercises = w.Exercises.Select(e => new ExerciseDto
+            //              {
+            //                  Id = e.Id,
+            //                  Name = e.Name,
+            //                  MuscleGroupName = e.MuscleGroup.Name
+            //              }),
+            //          })
+            //      }).ToList();
+
+
+            if (works == null)
+            {
+                return BadRequest();
+            }
+
+            return Ok(works.Workouts);
+
         }
 
 
-        [Authorize]
+
         [HttpPost]
         public async Task<ActionResult> Post(Workout workout)
         {
