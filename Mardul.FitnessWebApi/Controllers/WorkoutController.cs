@@ -19,12 +19,12 @@ namespace Mardul.FitnessWebApi.Controllers
     public class WorkoutController : ControllerBase
     {
         private readonly FitnessContext db;
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<User> userManager;
 
         public WorkoutController(FitnessContext context, UserManager<User> userManager)
         {
             db = context;
-            _userManager = userManager;
+            this.userManager = userManager;
 
         }
 
@@ -34,7 +34,7 @@ namespace Mardul.FitnessWebApi.Controllers
 
             var userId = User.Identity.Name;
 
-            var works = db.Users
+            var works = await db.Users
                  .Where(x => x.Id == userId)
                   .Select(x => new UserDto()
                   {
@@ -51,26 +51,7 @@ namespace Mardul.FitnessWebApi.Controllers
                           }),
                       })
                   })
-               .FirstOrDefault();
-
-            //var works = db.Users
-            //     .Where(x => x.Id == userId)
-            //      .Select(x => new UserDto()
-            //      {
-
-            //          Workouts = x.Workouts.Select(w => new WorkoutDto()
-            //          {
-            //              Id = w.Id,
-            //              Name = w.Name,
-            //              Exercises = w.Exercises.Select(e => new ExerciseDto
-            //              {
-            //                  Id = e.Id,
-            //                  Name = e.Name,
-            //                  MuscleGroupName = e.MuscleGroup.Name
-            //              }),
-            //          })
-            //      }).ToList();
-
+               .FirstOrDefaultAsync();
 
             if (works == null)
             {
@@ -86,18 +67,18 @@ namespace Mardul.FitnessWebApi.Controllers
         [HttpPost]
         public async Task<ActionResult> Post(Workout workout)
         {
-            var signUser = await _userManager.GetUserAsync(HttpContext.User);
-            var user = db.Users.FirstOrDefault(a => a == signUser);
+            var signUser = await userManager.GetUserAsync(HttpContext.User);
+            var User = db.Users.FirstOrDefault(a => a == signUser);
 
             if (workout == null)
             {
                 return BadRequest();
             }
-            user.Workouts.Add(workout);
-            db.Users.Update(user);
+            User.Workouts.Add(workout);
+            db.Users.Update(User);
             await db.SaveChangesAsync();
 
-            return Ok(user.Workouts);
+            return Ok(User.Workouts);
 
 
         }

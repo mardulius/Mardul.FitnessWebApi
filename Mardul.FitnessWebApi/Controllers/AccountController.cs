@@ -18,12 +18,12 @@ namespace Mardul.FitnessWebApi.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> userManager;
+        private readonly SignInManager<User> signInManager;
         public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+            this.userManager = userManager;
+            this.signInManager = signInManager;
         }
 
         [AllowAnonymous]
@@ -35,16 +35,24 @@ namespace Mardul.FitnessWebApi.Controllers
                     return BadRequest();
                 }
 
-                User user = new User { Email = registerModel.Email, UserName = registerModel.UserName };
+                User NewUser = new User { Email = registerModel.Email, UserName = registerModel.UserName };
 
-                var result = await _userManager.CreateAsync(user, registerModel.Password);
+                var result = await userManager.CreateAsync(NewUser, registerModel.Password);
 
                 if (result.Succeeded)
                 {
+                    var tokenString = GenerateJWT(NewUser);
 
-                    await _signInManager.SignInAsync(user, false);
-                    return Ok();
+
+                    var response = new
+                    {
+                        accessToken = tokenString,
+                        username = NewUser.UserName
+                    };
+
+                    return Ok(response);
                 }
+
                 else
                 {
                     return BadRequest();
@@ -63,19 +71,19 @@ namespace Mardul.FitnessWebApi.Controllers
                 return BadRequest();
             }
 
-            var user = await _userManager.FindByNameAsync(loginModel.UserName);
-            if (user != null && await _userManager.CheckPasswordAsync(user, loginModel.Password))
+            var UserLogin = await userManager.FindByNameAsync(loginModel.UserName);
+            if (UserLogin != null && await userManager.CheckPasswordAsync(UserLogin, loginModel.Password))
             {
 
 
 
-                var tokenString = GenerateJWT(user);
+                var tokenString = GenerateJWT(UserLogin);
 
 
                 var response = new
                 {
                     accessToken = tokenString,
-                    username = user.UserName
+                    username = UserLogin.UserName
                 };
 
                 return Ok(response);
@@ -112,8 +120,8 @@ namespace Mardul.FitnessWebApi.Controllers
         [HttpPost("Logout")]
             public async Task<ActionResult> Logout()
             {
-                // удаляем аутентификационные куки
-                await _signInManager.SignOutAsync();
+                
+                await signInManager.SignOutAsync();
                 return Ok();
             }
 
